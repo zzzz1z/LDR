@@ -3,7 +3,13 @@ const cors = require("cors")
 require("dotenv").config()
 
 const app = express()
-app.use(cors())
+// After
+app.use(cors({
+  origin: [
+    "https://ldrf.vercel.app",
+    "http://localhost:4321", // keep this for local dev
+  ]
+}))
 app.use(express.json())
 
 app.use("/auth",   require("./routes/auth"))

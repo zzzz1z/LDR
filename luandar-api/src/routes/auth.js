@@ -5,7 +5,12 @@ const db = require("../db")
 
 // Create first admin (run once, then remove or protect this route)
 router.post("/setup", async (req, res) => {
-  const { email, password } = req.body
+  const { email, password, secret } = req.body
+
+  if (secret !== process.env.SETUP_SECRET) {
+    return res.status(403).json({ error: "Forbidden" })
+  }
+
   const hash = await bcrypt.hash(password, 10)
   const { rows } = await db.query(
     "INSERT INTO admins (email, password) VALUES ($1, $2) RETURNING id, email",
