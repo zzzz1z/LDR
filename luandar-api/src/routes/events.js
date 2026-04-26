@@ -1,4 +1,5 @@
 const router = require("express").Router()
+const axios = require("axios")
 const db = require("../db")
 const auth = require("../middleware/auth")
 
@@ -26,7 +27,30 @@ router.post("/", async (req, res) => {
        decoracao, catering, dj, som,
        preco_base, total, forma_pagamento, pedidos]
     )
-    res.status(201).json(rows[0])
+
+    const event = rows[0]
+
+    // Send push notification to admin
+    try {
+      const tokenResult = await db.query(
+        "SELECT push_token FROM admins WHERE push_token IS NOT NULL LIMIT 1"
+      )
+      if (tokenResult.rows.length > 0) {
+        await axios.post("https://exp.host/--/api/v2/push/send", {
+          to: tokenResult.rows[0].push_token,
+          title: "Nova Reserva ◆",
+          body: `${event.nome} · ${event.tipo_evento} · ${new Date(event.data_evento).toLocaleDateString("pt-PT")}`,
+          sound: "default",
+          channelId: "reservas",
+          priority: "high",
+        })
+      }
+    } catch {
+      // never block the booking if push fails
+    }
+
+    res.status(201).json(event)
+
   } catch (err) {
     res.status(500).json({ error: err.message })
   }

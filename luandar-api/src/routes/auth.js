@@ -19,6 +19,13 @@ router.post("/setup", async (req, res) => {
   res.json(rows[0])
 })
 
+router.post("/push-token", authenticate, async (req, res) => {
+  const { token } = req.body
+  if (!token) return res.status(400).json({ error: "Token required" })
+  await db.query("UPDATE admins SET push_token = $1", [token])
+  res.json({ ok: true })
+})
+
 // Login
 router.post("/login", async (req, res) => {
   const { email, password } = req.body
