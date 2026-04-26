@@ -2,6 +2,7 @@ const router = require("express").Router()
 const bcrypt = require("bcryptjs")
 const jwt = require("jsonwebtoken")
 const db = require("../db")
+const authenticate = require("../middleware/auth")
 
 // Create first admin (run once, then remove or protect this route)
 router.post("/setup", async (req, res) => {
