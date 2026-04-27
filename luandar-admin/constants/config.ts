@@ -1,0 +1,1 @@
+export const API_URL = "https://ldr-7k7b.onrender.com"
